@@ -28,7 +28,15 @@ TrafficerMC has a variety of features. Some of them are:
  - EasyMC Support
  - and way more!
 
-#### Minecraft Version 1.8.x - 1.20
+#### Minecraft versions 1.8.x - 1.21.11, plus 26.1.2 and 26.2 compatibility mode
+
+Minecraft 26.1.2 and 26.2 bots use a lightweight compatibility client while
+full Mineflayer support is still in development upstream. They can join,
+receive chat, send chat messages and commands, run chat/delay scripts,
+disconnect, reconnect, use Microsoft or offline authentication, and connect
+through the existing SOCKS proxy option. Movement, inventory, combat,
+Anti-AFK, and world interaction remain available only on Mineflayer-backed
+versions.
 
 ## Media
 

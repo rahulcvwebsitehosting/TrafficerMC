@@ -160,17 +160,23 @@ async function newBot(options) {
         botApi.emit("login", bot.username)
         botApi.once(bot.username+'disconnect', () => {bot.quit()})
         botApi.once(bot.username+'reconnect', () => {newBot(options)})
+        botApi.on(bot.username+'chat', (o) => { if(idCheckAntiSpam.checked) { bot.chat(o.toString().replaceAll("(SALT)", salt(4))+" "+salt(antiSpamLength.value ? antiSpamLength.value : 5)) } else { bot.chat(o.toString().replaceAll("(SALT)", salt(4))) } })
+        botApi.on(bot.username+'startscript', () => {startScript(bot.username, idScriptPath.value)})
+        if(idScriptCheck.checked) { startScript(bot.username, idScriptPath.value)}
+        idBtnRc.addEventListener('click', () => {botApi.emit(bot.username+'reconnect')})
+
+        if (bot.chatOnly) {
+            sendLog(`[${bot.username}] ${bot.version} compatibility mode: join, chat, commands, scripts, disconnect and reconnect are available.`)
+            return
+        }
+
         botApi.on(bot.username+'useheld', () => {bot.activateItem()})
         botApi.on(bot.username+'closewindow', () => {bot.closeWindow(bot.currentWindow)})
-        botApi.on(bot.username+'chat', (o) => { if(idCheckAntiSpam.checked) { bot.chat(o.toString().replaceAll("(SALT)", salt(4))+" "+salt(antiSpamLength.value ? antiSpamLength.value : 5)) } else { bot.chat(o.toString().replaceAll("(SALT)", salt(4))) } })
         botApi.on(bot.username+'sethotbar', (o) => {bot.setQuickBarSlot(o)})
         botApi.on(bot.username+'winclick', (o, i) => {if(i == 0) {bot.clickWindow(o, 0, 0)} else {bot.clickWindow(o, 1, 0)}})
         botApi.on(bot.username+'stopcontrol', (o) => {bot.setControlState(o, false)})
         botApi.on(bot.username+'look', (o) => {bot.look(o, 0)})
         botApi.on(bot.username+'sprintcheck', (o) => {bot.setControlState('sprint', o)})
-        botApi.on(bot.username+'startscript', () => {startScript(bot.username, idScriptPath.value)})
-        if(idScriptCheck.checked) { startScript(bot.username, idScriptPath.value)}
-        
         botApi.on(bot.username+'afkon', () => {
             if(!afkLoaded) {
                 afkLoaded = true
@@ -203,8 +209,6 @@ async function newBot(options) {
             bot.setControlState(o, true)
             if(idCheckSprint.checked === true) {bot.setControlState('sprint', true)} else {bot.setControlState('sprint', false)}
         })
-    
-        idBtnRc.addEventListener('click', () => {botApi.emit(bot.username+'reconnect')})
     
         botApi.on(bot.username + 'hit', () => {
             const entities = Object.values(bot.entities);
@@ -255,7 +259,7 @@ async function newBot(options) {
     });
     bot.once('spawn', ()=> {
         botApi.emit("spawn", bot.username)
-        if(idJoinMessage) {bot.chat(idJoinMessage.value)}
+        if(idJoinMessage?.value) {bot.chat(idJoinMessage.value)}
     });
     bot.once('kicked', (reason)=> {
         botApi.emit("kicked", bot.username, reason)

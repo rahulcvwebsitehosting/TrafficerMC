@@ -1,11 +1,12 @@
 const mineflayer = require('mineflayer');
+const { createModernBot, isModernVersion } = require('./modernBot')
 const { EventEmitter } = require('events')
 const socks = require('socks').SocksClient
 const ProxyAgent = require('proxy-agent')
 const botApi = new EventEmitter()
 const fetch = require('node-fetch')
 const fs = require('fs')
-const currentVersion = "2.3"
+const currentVersion = "2.4"
 let stopBot = false
 
 //bot connect method
@@ -388,6 +389,10 @@ function createBot(options) {
         options.auth = easyMcAuth
         options.sessionServer ||= 'https://sessionserver.easymc.io'
         options.username = Buffer.alloc(0)
+    }
+
+    if (isModernVersion(options.version)) {
+        return createModernBot(options)
     }
 
     return mineflayer.createBot(options)

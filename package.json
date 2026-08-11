@@ -2,12 +2,18 @@
   "name": "trafficermc",
   "author": "RattlesHyper",
   "maintainer": "RattlesHyper",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "A Minecraft botting tool with Anti-AFK, Chat spammer, Inventory/Chest manager features.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rahulcvwebsitehosting/TrafficerMC.git"
+  },
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "postinstall": "node node_modules/electron/install.js",
+    "test": "node --test test/*.test.js",
     "winx64": "electron-builder build --win --x64",
     "winx86": "electron-builder build --win --ia32",
     "linux64": "electron-builder build --linux --x64",
@@ -16,23 +22,33 @@
   "dependencies": {
     "electron-json-storage": "^4.6.0",
     "electron-store": "^8.1.0",
-    "minecraft-protocol": "^1.44.0",
-    "mineflayer": "^4.10.1",
+    "minecraft-data": "^3.113.1",
+    "minecraft-protocol": "^1.66.2",
+    "mineflayer": "^4.37.1",
     "node-fetch": "2.6.7",
     "proxy-agent": "^5.0.0",
     "socks": "^2.7.0"
   },
   "devDependencies": {
-    "electron": "^21.3.0",
-    "electron-builder": "^23.6.0"
+    "electron": "40.9.3",
+    "electron-builder": "^26.0.12"
   },
   "build": {
     "appId": "com.rattleshyper.trafficermc",
     "productName": "TrafficerMC",
     "copyright": "Copyright © 2022 RattlesHyper",
+    "files": [
+      "main.js",
+      "index.html",
+      "VERSION",
+      "assets/**/*",
+      "package.json",
+      "!releases{,/**/*}",
+      "!test{,/**/*}",
+      "!dist{,/**/*}"
+    ],
     "win": {
       "target": "portable",
-      "publisherName": "RattlesHyper",
       "icon": "assets/icons/app/icon.png"
     },
     "linux": {
@@ -42,5 +58,7 @@
       "icon": "assets/icons/app/icon.png",
       "category": "Utility"
     }
-  }
+  },
+  "keywords": [],
+  "type": "commonjs"
 }
