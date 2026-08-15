@@ -13,8 +13,12 @@ function verifyModernVersion(version) {
             chatReceived: false,
             systemChatReceived: false,
             teleportConfirmed: false,
-            playerLoaded: false
+            playerLoaded: false,
+            loginAfterPlayPacket: false,
+            spawnAfterPosition: false
         }
+        let sentPlayLogin = false
+        let sentPosition = false
         let bot
         let settled = false
 
@@ -66,19 +70,27 @@ function verifyModernVersion(version) {
                 })
                 finish()
             })
-            client.write('login', { ...data.loginPacket, entityId: client.id, onlineMode: false })
-            client.write('position', {
-                teleportId: 42,
-                x: 0,
-                y: 64,
-                z: 0,
-                dx: 0,
-                dy: 0,
-                dz: 0,
-                yaw: 0,
-                pitch: 0,
-                flags: {}
-            })
+            // Keep a gap after configuration so the test catches adapters
+            // that incorrectly treat `playerJoin` as a completed game join.
+            setTimeout(() => {
+                sentPlayLogin = true
+                client.write('login', { ...data.loginPacket, entityId: client.id, onlineMode: false })
+                setTimeout(() => {
+                    sentPosition = true
+                    client.write('position', {
+                        teleportId: 42,
+                        x: 0,
+                        y: 64,
+                        z: 0,
+                        dx: 0,
+                        dy: 0,
+                        dz: 0,
+                        yaw: 0,
+                        pitch: 0,
+                        flags: {}
+                    })
+                }, 75)
+            }, 75)
         })
 
         server.once('listening', () => {
@@ -90,7 +102,13 @@ function verifyModernVersion(version) {
                 auth: 'offline'
             })
             bot.on('error', finish)
-            bot.on('login', () => bot.chat(`hello from ${version}`))
+            bot.on('login', () => {
+                result.loginAfterPlayPacket = sentPlayLogin
+            })
+            bot.on('spawn', () => {
+                result.spawnAfterPosition = sentPosition
+                bot.chat(`hello from ${version}`)
+            })
             bot.on('messagestr', message => {
                 if (message.includes(`server reply ${version}`)) {
                     result.systemChatReceived = true
@@ -112,7 +130,9 @@ test('26.1.2 and 26.2 bots join and exchange chat', { timeout: 30000 }, async ()
             chatReceived: true,
             systemChatReceived: true,
             teleportConfirmed: true,
-            playerLoaded: true
+            playerLoaded: true,
+            loginAfterPlayPacket: true,
+            spawnAfterPosition: true
         })
     }
 })

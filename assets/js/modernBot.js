@@ -157,11 +157,13 @@ class ModernBot extends EventEmitter {
             if (session?.selectedProfile?.name) this.username = session.selectedProfile.name
         })
 
-        client.once('playerJoin', () => {
-            this.joined = true
+        // `playerJoin` only means minecraft-protocol has finished the
+        // configuration state. The server has not necessarily sent the play
+        // login packet yet, so reporting a login (and sending chat) here can
+        // make commands disappear before the player actually exists.
+        client.once('login', () => {
             this.username = client.username || this.username
             this.emit('login')
-            this.emit('spawn')
         })
 
         client.on('position', packet => {
@@ -169,6 +171,10 @@ class ModernBot extends EventEmitter {
             if (!this.sentPlayerLoaded) {
                 this.sentPlayerLoaded = true
                 client.write('player_loaded', {})
+            }
+            if (!this.joined) {
+                this.joined = true
+                this.emit('spawn')
             }
         })
 
